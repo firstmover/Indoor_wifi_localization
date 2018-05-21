@@ -13,7 +13,7 @@
 
   ![1526893820255](./figures/iwconfig1.png)
 
-  如图这里选择wlan网卡***wlp3s0***
+  如图这里选择wlan网卡**wlp3s0**
 
 - 查看对应无线网卡是否支持**monitor mode**
 
@@ -21,13 +21,13 @@
 
    ![1526895198531](./figures/iwlist.png)
 
-- 修改脚本***setmon.sh***,将其中的网卡名称换成对应的网卡名称
+- 修改脚本**setmon.sh**,将其中的网卡名称换成对应的网卡名称
 
-- **以管理员身份**执行***setmon.sh***，将网卡配置为***monitor mode***
+- **以管理员身份**执行**setmon.sh**，将网卡配置为**monitor mode**
 
   > sudo ./setmon.sh
 
-  脚本会要求输入管理员密码，同时会关闭***network-manager***, 即之后无法使用该网卡联网
+  脚本会要求输入管理员密码，同时会关闭**network-manager**, 即之后无法使用该网卡联网
 
   运行之后可以执行
 
@@ -37,7 +37,7 @@
 
 - 配置输入SSID文件，文件中每一行对应一个所要提取rssi的AP的SSID,如下![1526894302071](./figures/ssid.png)
 
-- 以**管理员身份**运行程序***sniff_rssi.py***, 注意以**python3**执行，执行**sudo python3 sniff_rssi.py -h**查看帮助，示例运行如下
+- 以**管理员身份**运行程序**sniff_rssi.py**, 注意以**python3**执行，执行**sudo python3 sniff_rssi.py -h**查看帮助，示例运行如下
 
   >sudo python3 sniff_rssi.py --iface wlp3s0 --input ssids.txt --output rssi.json --amount 100
 
