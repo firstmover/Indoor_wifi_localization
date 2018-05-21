@@ -21,7 +21,7 @@
 
    ![1526895198531](./figures/iwlist.png)
 
-- 修改脚本**setmon.sh**,将其中的网卡名称换成对应的网卡名称
+- 修改脚本**setmon.sh**和**unsetmon.sh**,将其中的网卡名称换成对应的网卡名称
 
 - **以管理员身份**执行**setmon.sh**，将网卡配置为**monitor mode**
 
