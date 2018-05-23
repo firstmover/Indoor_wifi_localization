@@ -4,11 +4,8 @@ import struct
 import json
 import scapy.all as sca
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--input", required=True, type=str, help="input file containing list of Wi-Fi SSIDs, one SSID per line")
-parser.add_argument("--output", required=True, type=str, help="output file recording RSSIs")
-parser.add_argument("--iface", required=True, type=str, help="NIC interface to sniff on, NOTE monitor mode must be open beforehand!")
-parser.add_argument("--amount", default=100, type=int, help="amount of total beacon frames to be captured at once(default: 100)")
+from IPython import embed 
+
 
 class PktFilter(object):
     """
@@ -28,7 +25,7 @@ class ScapyRssi:
         self.filter = PktFilter(ssids)
 
     def sniff(self, interface, amount):
-        packets = sca.sniff(iface=interface, lfilter=self.filter, count=amount)
+        packets = sca.sniff(iface=interface, lfilter=self.filter, count=amount, monitor=True)
         for pkt in packets:
             ssid, rssi = self.parsePacket(pkt)
             print(ssid, rssi)
@@ -51,11 +48,22 @@ class ScapyRssi:
 
 
 def main():
+    # argument parser 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", '-i', required=True, type=str, 
+            help="input file containing list of Wi-Fi SSIDs, one SSID per line")
+    parser.add_argument("--output", '-o', required=True, type=str, 
+            help="output file recording RSSIs")
+    parser.add_argument("--iface", '-if', required=True, type=str, 
+            help="NIC interface to sniff on, NOTE monitor mode must be open beforehand!")
+    parser.add_argument("--amount", '-a', default=100, type=int, 
+            help="amount of total beacon frames to be captured at once(default: 100)")
     args = parser.parse_args()
-    i = open(args.input, "r")
-    ssids = [_.strip() for _ in i.readlines()]
-    i.close()
-    print(ssids)
+
+    # read ssids from input file. 
+    with open(args.input, "r") as i:
+        ssids = [_.strip() for _ in i.readlines()]
+    print('SSIDs: {}'.format(ssids))
 
     # do sniff
     sniffer = ScapyRssi(ssids)
