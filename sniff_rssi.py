@@ -1,10 +1,11 @@
 #!python3
+import platform
+PLATFORM = platform.system() 
 import argparse
 import struct
-import json
-import scapy.all as sca
-
-from IPython import embed 
+import json 
+import scapy.all as sca 
+from IPython import embed
 
 
 class PktFilter(object):
@@ -25,7 +26,13 @@ class ScapyRssi:
         self.filter = PktFilter(ssids)
 
     def sniff(self, interface, amount):
-        packets = sca.sniff(iface=interface, lfilter=self.filter, count=amount, monitor=True)
+        # TODO: why Linux do not support monitor=True?
+        if PLATFORM == 'Darwin':
+            packets = sca.sniff(iface=interface, lfilter=self.filter, count=amount, monitor=True)
+        elif PLATFORM == 'Linux':
+            packets = sca.sniff(iface=interface, lfilter=self.filter, count=amount)
+        else:
+            raise ValueError('unknown system.')
         for pkt in packets:
             ssid, rssi = self.parsePacket(pkt)
             print(ssid, rssi)
@@ -50,15 +57,19 @@ class ScapyRssi:
 def main():
     # argument parser 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", '-i', required=True, type=str, 
+    parser.add_argument("--input", '-i', default='SSIDs.txt', required=True, type=str, 
             help="input file containing list of Wi-Fi SSIDs, one SSID per line")
-    parser.add_argument("--output", '-o', required=True, type=str, 
+    parser.add_argument("--output", '-o', default='result.txt', required=True, type=str, 
             help="output file recording RSSIs")
     parser.add_argument("--iface", '-if', required=True, type=str, 
             help="NIC interface to sniff on, NOTE monitor mode must be open beforehand!")
     parser.add_argument("--amount", '-a', default=100, type=int, 
             help="amount of total beacon frames to be captured at once(default: 100)")
     args = parser.parse_args()
+
+    # only support MacOS and Linux 
+    if PLATFORM not in ['Linux', 'Darwin']:
+        raise ValueError('only support Linux or MacOS system.')
 
     # read ssids from input file. 
     with open(args.input, "r") as i:

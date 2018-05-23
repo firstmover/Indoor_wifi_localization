@@ -2,10 +2,10 @@
 
 ## 运行环境说明
 
-- 建议运行环境: ubuntu 16.x as sudo, python3
+- 建议运行环境: Macos, ubuntu 16.x as sudo, python3
 - 硬件要求: 支持monitor mode的网卡
 
-## 运行前准备
+## ubuntu 16.x
 
 - 查看所要运行网卡编号
 
@@ -42,6 +42,10 @@
   >sudo python3 sniff_rssi.py --iface wlp3s0 --input ssids.txt --output rssi.json --amount 100
 
   注意程序会将提取的rssi保存为**json**
+
+  使用 sudo 权限可能导致 python 找不到目标 module，需要调整环境变量，使用一下命令
+
+  >sudo -HE env PATH=$PATH python3 sniff_rssi.py --iface wlp3s0 --input ssids.txt --output rssi.json --amount 100
 
 - 运行完毕关闭**monitor mode**并开启**network-manager**
 
