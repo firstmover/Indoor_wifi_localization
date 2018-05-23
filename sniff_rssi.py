@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/env python3
 import platform
 PLATFORM = platform.system() 
 import argparse
@@ -17,7 +17,7 @@ class PktFilter(object):
 
     def __call__(self, pkt):
         return pkt.haslayer(sca.Dot11Beacon) and pkt.ID == 0 \
-                            and str(pkt.info, encoding="utf-8") in self.ssids
+                            and pkt.info in [i.encode('utf-8') for i in self.ssids]
 
 class ScapyRssi:
     def __init__(self, ssids):
