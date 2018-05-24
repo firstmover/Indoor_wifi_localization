@@ -51,9 +51,22 @@
 
   > sudo ./unsetmon.sh
 
+## MacOS 
 
+- 查看网卡编号
+
+  > networksetup -listallhardwareports
+
+  ![img_check_port](./figures/macos_check_port.png)
+
+  使用网卡**en0**
+
+- 管理员身份运行**sniff_rssi.py**
+
+  > sudo python3 sniff_rssi.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
 
 ## 参考资料
 
 - 关于**monitor mode**和一般网卡提取rssi的问题：https://wiki.wireshark.org/CaptureSetup/WLAN#Linux
 - 开启**monitor mode**的另一工具: http://www.aircrack-ng.org/doku.php?id=airmon-ng
+- MacOS命令行网络设置检查：http://osxdaily.com/2014/09/03/list-all-network-hardware-from-the-command-line-in-os-x/
