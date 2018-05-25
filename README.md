@@ -73,7 +73,17 @@
 
   > watch -n 0.2 nmvli dev wifi list
 
-  > sudo iwlist wlp3s0 scan 
+  > sudo iwlist wlp3s0 scan
+
+- MaxOS
+
+  先建立系统 airport 命令的软连接
+
+  > sudo ln -s /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport /usr/sbin/airport
+
+  用 grep 和 watch 指令动态获取当前 AP 情况。
+
+  > watch -n 0.5 "airport -s | grep 'Xiaome'"
 
 ## 建立预测模型
 
