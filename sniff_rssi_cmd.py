@@ -2,6 +2,7 @@
 import platform
 import argparse
 import json 
+import subprocess 
 import scapy.all as sca
 
 PLATFORM = platform.system()
@@ -21,32 +22,28 @@ class PktFilter(object):
                             and pkt.info in [i.encode('utf-8') for i in self.ssids]
 
 
-def sniff_rssi(interface, ssid, amount):
-    # pkt filter
-    pkt_filter = PktFilter([ssid])
-
-    # TODO: why Linux do not support monitor=True?
+def sniff_rssi_cmd(interface, ssid, amount):
+    import time 
     if PLATFORM == 'Darwin':
-        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount, monitor=True)
+        data = []
+        while True:
+            std_out = subprocess.check_output(['airport', '-s'])
+            std_out = std_out.decode('utf-8').split('\n')
+            # not sure what happens when ssid is Chinese.
+            std_out = std_out[1:]
+            ssid_sniffed = [i[:32].strip() for i in std_out if len(i) > 32]
+            for i, s in enumerate(ssid_sniffed):
+                if s == ssid:
+                    data.append(int(std_out[i][51:54]))
+                    break 
+            if len(data) >= amount:
+                break 
+        return data 
+
     elif PLATFORM == 'Linux':
-        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount)
+        raise NotImplementedError('Linux cmd sniffing not implemented.')
     else:
         raise ValueError('unknown system.')
-
-    def parse_packet(p):
-        field, val = p.getfield_and_val("present")
-        names = [field.names[i] for i in range(len(field.names)) if (1 << i) & val != 0]
-        # check if has signal strength field
-        if "dBm_AntSignal" in names:
-            return str(p.info, encoding="utf-8"), -(256 - ord(p.notdecoded[-2:-1]))
-        return None, None
-
-    data = []
-    for pkt in packets:
-        pkt_ssid, rssi = parse_packet(pkt)
-        assert pkt_ssid == ssid
-        data.append(rssi)
-    return data
 
 
 def main():
@@ -78,7 +75,7 @@ def main():
     data_dict = {'tag': args.tag}
     for ssid in ssids:
         print("sniffing ssid: {}".format(ssid))
-        data = sniff_rssi(args.iface, ssid, args.amount)
+        data = sniff_rssi_cmd(args.iface, ssid, args.amount)
         data_dict[ssid] = data
 
     # save to json
