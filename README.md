@@ -67,6 +67,14 @@
 
   > sudo python3 sniff_rssi.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
 
+### 动态查看RSSI
+
+- Linux
+
+  > watch -n 0.2 nmvli dev wifi list
+
+  > sudo iwlist wlp3s0 scan 
+
 ## 建立预测模型
 
 ## 参考资料
