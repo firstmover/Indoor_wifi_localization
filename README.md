@@ -1,11 +1,13 @@
 # Indoor_wifi_localization
 
-## 运行环境说明
+## 测量RSSI信号数据并建立数据库
+
+### 运行环境说明
 
 - 建议运行环境: Macos, ubuntu 16.x as sudo, python3
 - 硬件要求: 支持monitor mode的网卡
 
-## ubuntu 16.x
+### ubuntu 16.x
 
 - 查看所要运行网卡编号
 
@@ -51,7 +53,7 @@
 
   > sudo ./unsetmon.sh
 
-## MacOS 
+### MacOS 
 
 - 查看网卡编号
 
@@ -65,8 +67,15 @@
 
   > sudo python3 sniff_rssi.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
 
+## 建立预测模型
+
 ## 参考资料
+
+### websites & blogs 
 
 - 关于**monitor mode**和一般网卡提取rssi的问题：https://wiki.wireshark.org/CaptureSetup/WLAN#Linux
 - 开启**monitor mode**的另一工具: http://www.aircrack-ng.org/doku.php?id=airmon-ng
 - MacOS命令行网络设置检查：http://osxdaily.com/2014/09/03/list-all-network-hardware-from-the-command-line-in-os-x/
+- 8 Linux Commands: To Find Out Wireless Network Speed, Signal Strength And Other Information: https://www.cyberciti.biz/tips/linux-find-out-wireless-network-speed-signal-strength.html
+
+### papers
