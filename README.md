@@ -67,6 +67,10 @@
 
   > sudo python3 sniff_rssi.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
 
+- 使用命令行解析RSSI，运行 **sniff_rssi_cmd.py**
+
+  > sudo python3 sniff_rssi_cmd.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
+
 ### 动态查看RSSI
 
 - Linux
@@ -83,7 +87,7 @@
 
   用 grep 和 watch 指令动态获取当前 AP 情况。
 
-  > watch -n 0.5 "airport -s | grep 'Xiaome'"
+  > watch -n 0.5 "airport -s | grep 'Xiaomi'"
 
 ## 建立定位模型
 
