@@ -3,6 +3,7 @@ import platform
 import argparse
 import json 
 import scapy.all as sca
+from utils import *
 
 PLATFORM = platform.system()
 
@@ -83,8 +84,7 @@ def main():
 
     # save to json
     print("saving to: {}".format(args.output))
-    with open(args.output, "a") as o:
-        o.write(json.dumps(data_dict) + '\n')
+    savedict(data_dict, args.output)
 
 
 if __name__ == "__main__":

@@ -2,3 +2,4 @@
 __pychche__
 *.swp
 .idea
+*.pyc

@@ -85,7 +85,33 @@
 
   > watch -n 0.5 "airport -s | grep 'Xiaome'"
 
-## 建立预测模型
+## 建立定位模型
+
+### 运行环境说明
+
+- 测试通过环境:
+  - windows 10, python 2.7
+  - TBD
+
+### 运行前准备
+
+- 预先测量并存储的数据，数据应由之前所述的*sniff_rssi.py*产生, **注意存储json string的文件，tag域必须为x-y 的格式，其中x y代表对应该点的浮点坐标。不同位置的RSSI使用的AP名称(SSID)必须完全一致，且要求同一个AP在不同位置测量的RSSI序列长度一致(不同AP的可以不同)。作为训练(指纹)的数据和测试的数据必须使用相同的AP名称且相同AP的序列长度一致。同时文件编码应为utf-8。参考示例文件data/train.txt和data/val.txt**
+
+### 运行定位模型
+
+- 运行**python locate.py -h**查看参数说明，示例运行如下
+
+  > python locate.py --train ../data/train.txt --test ../data/val.txt --method 4NN --signal median
+
+  输出为按照test.txt中文件的顺序依次预测的二维坐标位置
+
+### 可视化
+
+TBD
+
+### 误差分析
+
+TBD
 
 ## 参考资料
 
