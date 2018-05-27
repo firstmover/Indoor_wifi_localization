@@ -111,7 +111,7 @@
 
 ### 可视化
 
- ![tem](D:\网络实习\network_wifi\Indoor_wifi_localization\figures\pred.png)
+ ![tem](figures\pred.png)
 
 ### 误差分析
 
