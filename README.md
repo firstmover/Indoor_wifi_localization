@@ -111,7 +111,7 @@
 
 ### 可视化
 
- ![tem](figures\pred.png)
+ ![tem](./figures/pred.png)
 
 ### 误差分析
 
