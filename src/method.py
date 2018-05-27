@@ -1,5 +1,30 @@
+import platform
+PLATFORM = platform.system()
 import sys
+reload(sys)
+# pity for windows
+if PLATFORM == "Windows":
+    sys.setdefaultencoding('gbk')
+else:
+    sys.setdefaultencoding('utf-8')
+
 import numpy as np
+from data_process import plot
+import matplotlib.pyplot as plt
+
+def plot_pred(train_ds, test_ds, pred, title=None):
+    fig = plot(train_ds.pos, color="b")
+    gt_mark = ["gt{0}_({1:.2f},{2:.2f})".format(i, test_ds.pos[i][0], test_ds.pos[i][1]) \
+                                  for i in range(len(test_ds.pos))]
+    pred_mark = ["pred{0}_({1:.2f},{2:.2f})".format(i, pred[i][0], pred[i][1]) \
+                                    for i in range(len(pred))]
+    fig = plot(test_ds.pos, fig=fig, color="y", mark=gt_mark) 
+    fig = plot(pred, fig=fig, color="r", mark=pred_mark) 
+    if not title is None:
+        plt.title(title)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    return fig
 
 class kNN(object):
     """

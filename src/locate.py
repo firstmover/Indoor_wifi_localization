@@ -3,8 +3,9 @@ import sys
 import json
 import argparse
 import numpy as np
-from dataset import Dataset
+from dataset import *
 from method import *
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="localization algorithm")
 parser.add_argument("--train", type=str, required=True, help="training data list, NOTE the file format must be json string, one sample per line,\
@@ -63,6 +64,17 @@ def main():
     print(true_coords)
     print("Pred coords")
     print(coords)
+    fig = plot_pred(train_ds, test_ds, coords, "data points prediciton using {}".format(args.method))
+    fig.show()
+    while 1:
+        c = raw_input("save or not?[Y/N]")
+        if c == "Y":
+            fig.savefig("tem.png")
+            break
+        elif c == "N":
+            break
+        else:
+            print("invalid input {}".format(c))
 
 if __name__ == "__main__":
     main()
