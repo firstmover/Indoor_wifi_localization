@@ -107,11 +107,11 @@
 
   > python locate.py --train ../data/train.txt --test ../data/val.txt --method 4NN --signal median
 
-  输出为按照test.txt中文件的顺序依次预测的二维坐标位置
+  输出为按照test.txt中文件的顺序依次预测的二维坐标位置以及散点图表示，示例图片见下
 
 ### 可视化
 
-TBD
+ ![tem](D:\网络实习\network_wifi\Indoor_wifi_localization\figures\pred.png)
 
 ### 误差分析
 
