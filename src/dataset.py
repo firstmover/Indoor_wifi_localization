@@ -9,24 +9,17 @@ def dicts2ndarray(data_dicts):
     convert list of dicts to ndarray of type np.float32
     """
     data_len = 0
-    aps = []
     # NEVER make any assumption about the order of .keys() return
-    for ap in data_dicts[0].keys():
-        if ap == "tag":
-            continue
-        aps.append(ap)
-        data_len += len(data_dicts[0][ap])
-    data_num = len(data_dicts)
-    # sort aps to induce a fix order
-    # NOTE: ap SSIDs of train and test set must be exactly the same
+    aps = data_dicts[0].keys()
+    aps.remove("tag")
     aps.sort()
+    data_num = len(data_dicts)
+    data_len = len(data_dicts[0][aps[0]])
 
-    ndary = np.zeros([data_num, data_len], dtype=np.float32)
+    ndary = np.zeros([data_num, len(aps), data_len], dtype=np.float32)
     for idx, d in enumerate(data_dicts):
-        st_idx = 0
-        for ap in aps:
-            ndary[idx, st_idx: st_idx+len(d[ap])] = d[ap]
-            st_idx += len(d[ap])
+        for aidx, ap in enumerate(aps):
+            ndary[idx, aidx, :] = d[ap]
 
     return ndary
 

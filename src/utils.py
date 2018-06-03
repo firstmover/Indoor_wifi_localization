@@ -18,4 +18,4 @@ def savedict(dct, outfile):
     convert dct to json strind and append to file outfile
     """
     with open(outfile, "a") as o:
-        o.write(json.dumps(data) + '\n')
+        o.write(json.dumps(dct) + '\n')

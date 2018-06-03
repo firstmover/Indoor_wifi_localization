@@ -3,3 +3,6 @@ __pychche__
 *.swp
 .idea
 *.pyc
+*tfevent*
+*.ckpt*
+checkpoint

@@ -8,6 +8,7 @@ if PLATFORM == "Windows":
 else:
     sys.setdefaultencoding('utf-8')
 
+import cnn_tf
 import numpy as np
 from data_process import plot
 import matplotlib.pyplot as plt
@@ -61,7 +62,20 @@ class kNN(object):
             coord = coord + kcoords[i] * kweight[i]
 
         return coord
-        
+
+class CNN(object):
+    """
+    convoluation neural network
+    """
+    def __init__(self, train_ds, weights_path=None):
+        x_shape = [None] + list(train_ds.ndary.shape[1:]) + [1]
+        y_shape = [None] + list(train_ds.pos.shape[1:])
+        self.cnn = cnn_tf.CNN(x_shape, y_shape, "../cnn_data/ckpt", "../cnn_data/tsbd", 0.00001)
+        self.cnn.initialize(weights_path)
+
+    def __call__(self, test_ds):
+        return self.cnn.test(test_ds)
+
 if __name__ == "__main__":
     # test, DO NOT run this
     assert len(sys.argv) == 3
