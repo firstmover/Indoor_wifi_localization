@@ -94,7 +94,7 @@
 ### 运行环境说明
 
 - 测试通过环境:
-  - windows 10, python 2.7
+  - MacOS, python 3.6
   - TBD
 
 ### 运行前准备
