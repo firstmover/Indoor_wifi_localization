@@ -3,8 +3,8 @@ import sys
 import json
 import argparse
 import numpy as np
-from dataset import *
-from method import *
+from dataset import Dataset
+from method import CNN, kNN
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="localization algorithm", formatter_class=argparse.RawTextHelpFormatter)
@@ -20,6 +20,17 @@ parser.add_argument("--signal", type=str, default="mean", help="signal type used
                     \n\tstd: standard deviation value of RSSI sequence\n\traw: raw RSSI sequence")
 parser.add_argument("--weights_path", type=str, default=None, help="pretrained weights path for CNN model,\
                                                                     NOTE this must be given is using CNN")
+
+
+def prepare_dataset(train_path, test_path, signal):
+    with open(train_path, 'r') as f:
+        train_lines = [l.strip() for l in f.readlines()]
+    with open(test_path, 'r') as f:
+        test_lines = [l.strip() for l in f.readlines()]
+    train_ds = Dataset(train_lines).get_signal(signal)
+    test_ds = Dataset(test_lines).get_signal(signal)
+    return train_ds, test_ds
+
 
 def main():
     args = parser.parse_args()

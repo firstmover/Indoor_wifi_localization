@@ -1,7 +1,7 @@
 import sys
 import copy
 import numpy as np
-from data_process import *
+from data_process import data_signal, data_mean, data_max, data_min, data_std, data_median
 from utils import str2dict, dict2str
 
 def dicts2ndarray(data_dicts):
@@ -36,7 +36,7 @@ class Dataset():
         self.aps.remove("tag")
         self.aps.sort()
         self.ap_num = len(self.aps)
-        self.tags = map(lambda x:x['tag'], self.data_dicts)
+        self.tags = map(lambda x: x['tag'], self.data_dicts)
 
         # 2-d coordinates (x, y)
         self.pos = np.zeros([len(self.tags), 2], dtype=np.float32)
@@ -69,7 +69,12 @@ class Dataset():
 
         #print(process_dicts)
         #print(type(process_dicts[0]))
-        return Dataset(process_dicts)     
+        return Dataset(process_dicts)
+
+    def get_signal(self, signal_name):
+        if signal_name not in list(data_signal.keys()):
+            raise ValueError("invalid signal name.")
+        return self.process(data_signal[signal_name])
     
     # some instances of process
     def mean(self):

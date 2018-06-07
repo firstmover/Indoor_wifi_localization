@@ -26,6 +26,16 @@ def data_median(data_lst):
 def data_std(data_lst):
     return [np.std(data_lst)]
 
+
+data_signal = {
+    "mean": lambda x: [float(sum(x)) / len(x)],
+    'max': lambda x: [max(x)],
+    'min': lambda x: [min(x)],
+    'median': lambda x: [np.median(x)],
+    'std': lambda x: [np.std(x)]
+}
+
+
 def plot(pos, fig=None, color=None, mark=None):
     """
     plot data points according to the positon given
