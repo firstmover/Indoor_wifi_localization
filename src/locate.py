@@ -4,7 +4,7 @@ import json
 import argparse
 import numpy as np
 from dataset import Dataset
-from method import CNN, kNN
+from method import CNN, kNN plot_pred
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="localization algorithm", formatter_class=argparse.RawTextHelpFormatter)
