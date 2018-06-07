@@ -19,7 +19,7 @@ def load_data(path):
 
 
 def main():
-    data = load_data('../data/result.txt')
+    data = load_data('../../data/result.txt')
     ssids = [i for i in list(data[0].keys()) if i != 'tag']
     ssid2rssi = {key: np.zeros((4, 8)) for key in ssids}
     for d in data:

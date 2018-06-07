@@ -3,7 +3,7 @@ import sys
 import json
 import argparse
 import numpy as np
-from dataset import Dataset
+from dataset import prepare_dataset
 from method import CNN, kNN, plot_pred
 import matplotlib.pyplot as plt
 
@@ -22,20 +22,13 @@ parser.add_argument("--weights_path", type=str, default=None, help="pretrained w
                                                                     NOTE this must be given is using CNN")
 
 
-def prepare_dataset(path, signal):
-    with open(path, 'r') as f:
-        lines = [l.strip() for l in f.readlines()]
-    return Dataset(lines).get_signal(signal)
-
-
 def main(args):
     train_ds = prepare_dataset(args.train, args.signal)
     test_ds = prepare_dataset(args.test, args.signal)
 
     if args.method == "CNN":
         if args.weights_path is None:
-            raise Exception("invalid weights path {} for CNN".format(args.weights_path))
-            sys.exit()
+            raise ValueError("invalid weights path {} for CNN".format(args.weights_path))
         # CNN
         locater = CNN(train_ds, args.weights_path)
     elif args.method.find("NN"):

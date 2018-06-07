@@ -42,7 +42,7 @@ def plot(pos, fig=None, color=None, mark=None):
     y = np.array([p[1] for p in pos])
     plt.scatter(x, y, c=color)
 
-    if not mark is None:
+    if mark is not None:
         for idx, p in enumerate(pos):
             text = mark[idx]
             ax.annotate(text, xy=tuple(p), xytext=tuple(p + .1),

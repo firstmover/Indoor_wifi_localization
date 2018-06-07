@@ -59,15 +59,11 @@ class kNN(object):
         dis_lst.sort(key=lambda tup: tup[0])
         # NOTE: weight proportional to 1/distance
         kweight = [1. / (tup[0] + 10e-5) for tup in dis_lst[0:self.k]]
-        # map(lambda tup: 1. / (tup[0] + 10e-5), dis_lst[0:self.k])
         kidx = [tup[1] for tup in dis_lst[0:self.k]]
-        # map(lambda tup: tup[1], dis_lst[0:self.k])
         kcoords = [self.train_ds.pos[idx] for idx in kidx]
-        # map(lambda idx: self.train_ds.pos[idx], kidx)
         # calculate the coordinates (x, y) using weighted sum
         weight_sum = sum(kweight)
         kweight = [weight / weight_sum for weight in kweight]
-        # map(lambda weight: weight / weight_sum, kweight)
         coord = np.zeros([2], dtype=np.float32)
         for i in range(self.k):
             coord = coord + kcoords[i] * kweight[i]

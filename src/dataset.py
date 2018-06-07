@@ -7,11 +7,19 @@ from utils import str2dict, dict2str
 from IPython import embed
 
 
+def prepare_dataset(path, signal):
+    with open(path, 'r') as f:
+        lines = [l.strip() for l in f.readlines()]
+    if signal not in list(data_signal.keys()):
+        raise ValueError("invalid signal name.")
+    ds = Dataset(lines)
+    return ds.process(data_signal(signal))
+
+
 def dicts2ndarray(data_dicts):
     """
     convert list of dicts to ndarray of type np.float32
     """
-    data_len = 0
     # NEVER make any assumption about the order of .keys() return
     aps = [ap for ap in data_dicts[0].keys() if ap != 'tag']
     aps.sort()
@@ -74,12 +82,6 @@ class Dataset():
         # print(process_dicts)
         # print(type(process_dicts[0]))
         return Dataset(process_dicts)
-
-    # some instances of process
-    def get_signal(self, signal_name):
-        if signal_name not in list(data_signal.keys()):
-            raise ValueError("invalid signal name.")
-        return self.process(data_signal[signal_name])
 
 
 if __name__ == "__main__":
