@@ -21,26 +21,25 @@ class PktFilter(object):
                     and str(pkt.info, encoding="utf-8") in self.ssids
                     #and pkt.info in [i.encode('utf-8') for i in self.ssids]
 
+def parse_packet(p):
+    field, val = p.getfield_and_val("present")
+    names = [field.names[i] for i in range(len(field.names)) if (1 << i) & val != 0]
+    # check if has signal strength field
+    if "dBm_AntSignal" in names:
+        return str(p.info, encoding="utf-8"), -(256 - ord(p.notdecoded[-2:-1]))
+    return None, None
 
-def sniff_rssi(interface, ssid, amount):
+def sniff_rssi(interface, ssid, amount, timeout=None):
     # pkt filter
     pkt_filter = PktFilter([ssid])
 
     # TODO: why Linux do not support monitor=True?
     if PLATFORM == 'Darwin':
-        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount, monitor=True)
+        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount, timeout=timeout, monitor=True)
     elif PLATFORM == 'Linux':
-        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount)
+        packets = sca.sniff(iface=interface, lfilter=pkt_filter, count=amount, timeout=timeout)
     else:
         raise ValueError('unknown system.')
-
-    def parse_packet(p):
-        field, val = p.getfield_and_val("present")
-        names = [field.names[i] for i in range(len(field.names)) if (1 << i) & val != 0]
-        # check if has signal strength field
-        if "dBm_AntSignal" in names:
-            return str(p.info, encoding="utf-8"), -(256 - ord(p.notdecoded[-2:-1]))
-        return None, None
 
     data = []
     for pkt in packets:

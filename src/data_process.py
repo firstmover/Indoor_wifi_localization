@@ -1,6 +1,7 @@
 import platform
 PLATFORM = platform.system()
 import sys
+
 reload(sys)
 # pity for windows
 if PLATFORM == "Windows":
