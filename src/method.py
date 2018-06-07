@@ -42,9 +42,9 @@ class kNN(object):
         self.k = k
         self.train_ds = train_ds
 
-    def __call__(self, test_ds):
-        coords = np.zeros([test_ds.pos_num, 2], dtype=np.float32)
-        for idx, vector in enumerate(test_ds.ndary):
+    def __call__(self, test_samples):
+        coords = np.zeros([len(test_samples), 2], dtype=np.float32)
+        for idx, vector in enumerate(test_samples):
             coords[idx] = self._locate(vector)
 
         return coords
@@ -82,8 +82,8 @@ class CNN(object):
         self.cnn = cnn_tf.CNN(x_shape, y_shape, "../cnn_data/ckpt", "../cnn_data/tsbd", 0.00001)
         self.cnn.initialize(weights_path)
 
-    def __call__(self, test_ds):
-        return self.cnn.test(test_ds)
+    def __call__(self, test_samples):
+        return self.cnn.test(test_samples)
 
 
 if __name__ == "__main__":

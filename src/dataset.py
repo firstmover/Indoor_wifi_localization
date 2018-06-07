@@ -13,7 +13,7 @@ def prepare_dataset(path, signal):
     if signal not in list(data_signal.keys()):
         raise ValueError("invalid signal name.")
     ds = Dataset(lines)
-    return ds.process(data_signal(signal))
+    return ds.process(data_signal[signal])
 
 
 def dicts2ndarray(data_dicts):
@@ -65,6 +65,8 @@ class Dataset():
             self.data_len[ap] = len(self.data_dicts[0][ap])
             self.total_data_len += self.data_len[ap]
         self.ndary = dicts2ndarray(self.data_dicts)
+
+        assert len(self.ndary) == self.tag_num
 
     def process(self, method):
         """

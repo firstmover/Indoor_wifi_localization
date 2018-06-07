@@ -39,7 +39,7 @@ def main(args):
         raise ValueError("unknown method {}, use -h for details".format(args.method))
 
     true_coords = test_ds.pos
-    coords = locater(test_ds)
+    coords = locater(test_ds.ndary)
     print("True coords")
     print(true_coords)
     print("Pred coords")

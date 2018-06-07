@@ -74,7 +74,7 @@ class CNN():
         with self.graph.as_default():
             epoch = st_epoch
             while epoch < ed_epoch:
-                loss, top, s = self.sess.run([self.loss, self.train_op, self.train_summary], \
+                loss, top, s = self.sess.run([self.loss, self.train_op, self.train_summary],
                                              feed_dict={self.X: np.expand_dims(train_ds.ndary, -1),
                                                         self.Y: train_ds.pos,
                                                         self.dropout_rate: 0.5
@@ -85,7 +85,7 @@ class CNN():
                     self.writer.add_summary(s, epoch)
 
                 if epoch % save_epochs == 0:
-                    loss, s = self.sess.run([self.loss, self.val_summary], \
+                    loss, s = self.sess.run([self.loss, self.val_summary],
                                             feed_dict={self.X: np.expand_dims(val_ds.ndary, -1),
                                                        self.Y: val_ds.pos,
                                                        self.dropout_rate: 1.0
@@ -95,12 +95,10 @@ class CNN():
                     ckpt_path = os.path.join(self.ckpt_dir, "model_epoch{}.ckpt".format(epoch))
                     self.saver.save(self.sess, ckpt_path)
 
-    def test(self, test_ds):
+    def test(self, test_samples):
         with self.graph.as_default():
-            pred, loss = self.sess.run([self.pred, self.loss], feed_dict={self.X: np.expand_dims(test_ds.ndary, -1),
-                                                                          self.Y: test_ds.pos,
-                                                                          self.dropout_rate: 1.0
-                                                                          })
+            pred = self.sess.run([self.pred], feed_dict={self.X: np.expand_dims(test_samples, -1),
+                                                         self.dropout_rate: 1.0})
             return pred
 
     def save(self, ckpt_path):
