@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 from datetime import datetime
+import random
 
 class Server():
     """Server process class"""
@@ -39,8 +40,7 @@ class Server():
 
     def _udp_start(self):
         print("[{}] Server: started at address {}...".format(datetime.now(), self.addr))
-        msg1 = '{"Xiaomi_8334": [0.5, 0],"Wireless PKU": [1.0, 0.5], "PKU Visitor":[0.5, 1.0]}'
-        msg2 = '{"x":0.2, "y":0.2}'
+        msg1 = '{"Xiaomi_8334": [0.5, 0],"Wireless PKU": [0.99, 0.5], "PKU Visitor":[0.5, 0.99]}'
         cnt = 0
         try:
             while 1:
@@ -52,7 +52,9 @@ class Server():
                     if choice == 1:
                         msg = msg1
                     else:
-                        msg = msg2
+                        x = random.uniform(0.1, 0.9)
+                        y = random.uniform(0.1, 0.9)
+                        msg = '{"x": %f, "y": %f}'%(x, y)
                     self.sock.sendto(msg, clientaddr)
                     print("[{}] Server send: {}({})".format(datetime.now(), msg, clientaddr))
         except Exception as e:

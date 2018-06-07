@@ -11,7 +11,7 @@ import process
 
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.graphics import Color, Ellipse
+from kivy.graphics import Color, Ellipse, InstructionGroup
 from kivy.clock import Clock
 from kivy.config import Config
 Config.set("graphics", "width", '300')
@@ -64,6 +64,8 @@ class sniffWidget(Widget):
         # initial coords
         self.coords = (0, 0)
 
+        self.obj = InstructionGroup()
+
     def config(self):
         name_dict = {"tag": self.tag}
         # send the tag 
@@ -88,9 +90,11 @@ class sniffWidget(Widget):
     def visual_aps(self):
         with self.canvas:
             Color(1, 0, 0)
-            d = 30.0
+            d = 10.0
             for ssid in self.ssids:
                 x, y = self.config_dict[ssid]
+                print(x*Window.size[0])
+                print(y*Window.size[1])
                 Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d))
 
     def sniff(self, dt):
@@ -126,11 +130,13 @@ class sniffWidget(Widget):
             self.coords = (recv_dict["x"], recv_dict["y"])
 
     def visualize(self):
-        with self.canvas:
-            Color = (1, 1, 0)
-            d = 30.
-            x, y = self.coords
-            Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d))
+        self.canvas.remove(self.obj)
+        self.obj = InstructionGroup()
+        d = 10.
+        x, y = self.coords
+        self.obj.add(Color(0,1,0))
+        self.obj.add(Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d)))
+        self.canvas.add(self.obj)
 
     def update(self, dt):
         # update periodic of interval dt(s)
