@@ -27,12 +27,13 @@ class Server:
         else:
             raise ValueError("invalid method.")
 
-        self.addr = ('127.0.0.1', 31500)
+        self.addr = ('127.0.0.1', 12138)
 
-    def get_pred_coord(self, x):
-        # get pred pos, x include one vector.
-        pred_pos = self.locater(data_signal[self.signal]([x]))[0]
-        return pred_pos
+        self.ap_position = {
+            "Xiaomi_8334": [0.5, 0],
+            "Wireless PKU": [0.99, 0.5],
+            "PKU Visitor": [0.5, 0.99]
+        }
 
     def listen_and_response(self):
         # server listening to request.
@@ -44,14 +45,23 @@ class Server:
             data, addr = s.recvfrom(2048)
             print("recieved {}: {}".format(addr, data))
             data = json.loads(data.decode())
-            vec = np.asarray([data[ap] for ap in self.train_ds.aps])
-            # pred_pos = self.get_pred_coord(vec)
-            print("vec: {}".format(vec))
-            vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
-            pred_pos = self.locater(vec)[0]
-            ret_dict = {'x': float(pred_pos[0]), 'y': float(pred_pos[1])}
-            print("send {}: {}".format(addr, ret_dict))
-            s.sendto(json.dumps(ret_dict).encode(), addr)
+            if len(list(data.keys())) == 1:
+                s.sendto(json.dumps(self.ap_position).encode(), addr)
+            else:
+                vec = [data[ap] for ap in self.train_ds.aps]
+                match_len = True
+                for i in vec:
+                    if len(i) != len(vec[0]):
+                        match_len = False
+                if not match_len:
+                    s.sendto(json.dumps({'x': 0, 'y': 0}).encode(), addr)
+                vec = np.asarray(vec)
+                print("vec: {}".format(vec))
+                vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
+                pred_pos = self.locater(vec)[0]
+                ret_dict = {'x': float(pred_pos[0]), 'y': float(pred_pos[1])}
+                print("send {}: {}".format(addr, ret_dict))
+                s.sendto(json.dumps(ret_dict).encode(), addr)
 
         s.close()
 
@@ -79,8 +89,8 @@ def client():
 
 
 def main():
-    server = Server("../data/train.txt", "CNN", 'raw', "../cnn_data/ckpt/euclid_loss/model_epoch5000.ckpt")
-    # server = Server('../data/train.txt', '4NN', 'median')
+    # server = Server("../data/train.txt", "CNN", 'raw', "../cnn_data/ckpt/euclid_loss/model_epoch5000.ckpt")
+    server = Server('../data/train.txt', '4NN', 'median')
     server.listen_and_response()
     return
     from dataset import prepare_dataset

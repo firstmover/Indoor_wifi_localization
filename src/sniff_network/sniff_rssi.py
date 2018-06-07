@@ -18,8 +18,8 @@ class PktFilter(object):
         # if pkt.haslayer(sca.Dot11Beacon) and pkt.ID == 0:
         #     print(pkt.info)
         return pkt.haslayer(sca.Dot11Beacon) and pkt.ID == 0 \
-                    and str(pkt.info, encoding="utf-8") in self.ssids
-                    #and pkt.info in [i.encode('utf-8') for i in self.ssids]
+                    and pkt.info in [i.encode('utf-8') for i in self.ssids]
+                    # and str(pkt.info, encoding="utf-8") in self.ssids
 
 def parse_packet(p):
     field, val = p.getfield_and_val("present")

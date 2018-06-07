@@ -168,7 +168,7 @@ class sniffApp(App):
         return sniffer
 
 if __name__ == "__main__":
-    iface = "wlp3s0"
+    iface = "en0"
     amount = 3
     tag = "zxz"
     func = process.__dict__["data_"+"median"]
