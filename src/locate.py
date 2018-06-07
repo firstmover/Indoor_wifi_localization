@@ -22,47 +22,15 @@ parser.add_argument("--weights_path", type=str, default=None, help="pretrained w
                                                                     NOTE this must be given is using CNN")
 
 
-def prepare_dataset(train_path, test_path, signal):
-    with open(train_path, 'r') as f:
-        train_lines = [l.strip() for l in f.readlines()]
-    with open(test_path, 'r') as f:
-        test_lines = [l.strip() for l in f.readlines()]
-    train_ds = Dataset(train_lines).get_signal(signal)
-    test_ds = Dataset(test_lines).get_signal(signal)
-    return train_ds, test_ds
+def prepare_dataset(path, signal):
+    with open(path, 'r') as f:
+        lines = [l.strip() for l in f.readlines()]
+    return Dataset(lines).get_signal(signal)
 
 
-def main():
-    args = parser.parse_args()
-    f = open(args.train, "r")
-    train_lines = [l.strip() for l in f.readlines()]
-    f.close()
-    f = open(args.test, "r")
-    test_lines = [l.strip() for l in f.readlines()]
-    f.close()
-
-    train_ds = Dataset(train_lines)
-    test_ds = Dataset(test_lines)
-    if args.signal == "mean":
-        train_ds = train_ds.mean()
-        test_ds = test_ds.mean()
-    elif args.signal == "median":
-        train_ds = train_ds.median()
-        test_ds = test_ds.median()
-    elif args.signal == "max":
-        train_ds = train_ds.max()
-        test_ds = test_ds.max()
-    elif args.signal == "min":
-        train_ds = train_ds.min()
-        test_ds = test_ds.min()
-    elif args.signal == "std":
-        train_ds = train_ds.std()
-        test_ds = test_ds.std()
-    elif args.signal == "raw":
-        pass
-    else:
-        raise Exception("unknown signal {}, use -h for details".format(args.signal))
-        sys.exit()
+def main(args):
+    train_ds = prepare_dataset(args.train, args.signal)
+    test_ds = prepare_dataset(args.test, args.signal)
 
     if args.method == "CNN":
         if args.weights_path is None:
@@ -75,8 +43,7 @@ def main():
         k = int(args.method[0:-2])
         locater = kNN(k, train_ds)
     else:
-        raise Exception("unknown method {}, use -h for details".format(args.method))
-        sys.exit()
+        raise ValueError("unknown method {}, use -h for details".format(args.method))
 
     true_coords = test_ds.pos
     coords = locater(test_ds)
@@ -87,7 +54,7 @@ def main():
     fig = plot_pred(train_ds, test_ds, coords, "data points prediciton using {}".format(args.method))
     fig.show()
     while 1:
-        c = raw_input("save or not?[Y/N]")
+        c = input("save or not?[Y/N]")
         if c == "Y":
             fig.savefig("tem.png")
             break
@@ -96,8 +63,10 @@ def main():
         else:
             print("invalid input {}".format(c))
 
+
 if __name__ == "__main__":
-    main()
+    args = parser.parse_args()
+    main(args)
 
     
 

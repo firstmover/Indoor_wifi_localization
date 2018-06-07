@@ -15,26 +15,6 @@ else:
     sys.setdefaultencoding('utf-8')
 
 
-def data_mean(data_lst):
-    return [float(sum(data_lst)) / len(data_lst)]
-
-
-def data_max(data_lst):
-    return [max(data_lst)]
-
-
-def data_min(data_lst):
-    return [min(data_lst)]
-
-
-def data_median(data_lst):
-    return [np.median(data_lst)]
-
-
-def data_std(data_lst):
-    return [np.std(data_lst)]
-
-
 data_signal = {
     "mean": lambda x: [float(sum(x)) / len(x)],
     'max': lambda x: [max(x)],

@@ -6,14 +6,11 @@ from data_process import data_signal
 
 
 class Server:
-    def __init__(self, train_ds_path, method, signal=None, model_path=None):
+    def __init__(self, train_ds_path, method, model_path=None):
         # prepare training dataset
         with open(train_ds_path, 'r') as f:
             lines = [l.strip() for l in f.readlines()]
-        if signal is None:
-            signal = 'mean'
-        self.signal = signal
-        train_ds = Dataset(lines).get_signal(signal)
+        train_ds = Dataset(lines).get_signal('mean')
 
         # locater
         if method == "CNN":
@@ -26,8 +23,7 @@ class Server:
             raise ValueError("invalid method.")
 
     def get_pred_coord(self, x):
-        x = data_signal[self.signal](x)
-        return self.locater(x)
+        return self.locater(data_signal['mean'](x))
 
     def listen_and_response(self):
         # server listening to request.
