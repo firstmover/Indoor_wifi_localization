@@ -63,7 +63,7 @@ class kNN(object):
         kcoords = [self.train_ds.pos[idx] for idx in kidx]
         # calculate the coordinates (x, y) using weighted sum
         weight_sum = sum(kweight)
-        kweight = [weight / weight_sum for weight in kweight]
+        kweight = [weight / float(weight_sum) for weight in kweight]
         coord = np.zeros([2], dtype=np.float32)
         for i in range(self.k):
             coord = coord + kcoords[i] * kweight[i]

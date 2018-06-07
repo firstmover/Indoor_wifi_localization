@@ -6,6 +6,7 @@ import numpy as np
 from dataset import prepare_dataset
 from method import CNN, kNN, plot_pred
 import matplotlib.pyplot as plt
+from IPython import embed
 
 parser = argparse.ArgumentParser(description="localization algorithm", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--train", type=str, required=True, help="training data list, NOTE the file format must be json string, \
@@ -40,6 +41,9 @@ def main(args):
 
     true_coords = test_ds.pos
     coords = locater(test_ds.ndary)
+    embed()
+    print("test_ds.ndary:")
+    print(test_ds.ndary)
     print("True coords")
     print(true_coords)
     print("Pred coords")

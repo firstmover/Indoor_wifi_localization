@@ -1,6 +1,7 @@
 import os
 import socket
 import json
+import numpy as np
 
 from dataset import prepare_dataset
 from method import CNN, kNN
@@ -37,24 +38,37 @@ class Server:
 
         while True:
             data, addr = s.recvfrom(2048)
-            data = json.loads(data)
-            vec = [data[ap] for ap in self.train_ds.aps]
-            pred_pos = self.get_pred_coord(vec)
-            ret_dict = {'x': pred_pos[0], 'y': pred_pos[1]}
-            s.sendto(json.dumps(ret_dict), addr)
+            print("recieved {}: {}".format(addr, data))
+            data = json.loads(data.decode())
+            vec = np.asarray([data[ap] for ap in self.train_ds.aps])
+            # pred_pos = self.get_pred_coord(vec)
+            print("vec: {}".format(vec))
+            vec = vec.reshape((1, vec.shape[0], 1))
+            pred_pos = self.locater(vec)[0]
+            ret_dict = {'x': float(pred_pos[0]), 'y': float(pred_pos[1])}
+            print("send {}: {}".format(addr, ret_dict))
+            s.sendto(json.dumps(ret_dict).encode(), addr)
 
         s.close()
 
 
 def pseudo_client():
+    test_ds = prepare_dataset("../data/val.txt", 'median')
+
     address = ('127.0.0.1', 31500)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    test_ds = prepare_dataset("../data/val.txt", 'median')
-    data_dict = []
-
-    while True:
-        s.sendto(data_dict, address)
+    for test_sample, pos in zip(test_ds.ndary, test_ds.pos):
+        data_dict = {}
+        for idx, ap in enumerate(test_ds.aps):
+            data_dict[ap] = float(test_sample[idx][0])
+        data_dict['tag'] = 'test'
+        print("send {}: {}".format(address, data_dict))
+        s.sendto(json.dumps(data_dict).encode(), address)
+        rec_pos, addr = s.recvfrom(2048)
+        print("recieved {}: {}".format(addr, rec_pos))
+        rec_pos = rec_pos.decode()
+        print("rec_pos: {}".format(rec_pos))
 
     s.close()
 
@@ -62,6 +76,13 @@ def pseudo_client():
 def main():
     server = Server("../data/train.txt", "4NN")
     server.listen_and_response()
+    return
+    from dataset import prepare_dataset
+    from method import kNN
+    train_ds = prepare_dataset("../data/train.txt", 'median')
+    test_ds = prepare_dataset("../data/val.txt", 'median')
+    locater = kNN(4, train_ds)
+    print("result: {}".format(locater(test_ds.ndary)))
 
 
 if __name__ == "__main__":
