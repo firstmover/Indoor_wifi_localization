@@ -4,5 +4,3 @@ __pychche__
 .idea
 *.pyc
 *tfevent*
-*.ckpt*
-checkpoint
