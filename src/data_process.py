@@ -1,27 +1,35 @@
 import platform
-PLATFORM = platform.system()
 import sys
-reload(sys)
-# pity for windows
-if PLATFORM == "Windows":
-    sys.setdefaultencoding('gbk')
-else:
-    sys.setdefaultencoding('utf-8')
-
 import numpy as np
 import matplotlib.pyplot as plt
+
+PLATFORM = platform.system()
+# pity for windows
+if PLATFORM == "Windows":
+    reload(sys)
+    sys.setdefaultencoding('gbk')
+elif PLATFORM == "Darwin":
+    pass
+else:
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
 
 def data_mean(data_lst):
     return [float(sum(data_lst)) / len(data_lst)]
 
+
 def data_max(data_lst):
     return [max(data_lst)]
+
 
 def data_min(data_lst):
     return [min(data_lst)]
 
+
 def data_median(data_lst):
     return [np.median(data_lst)]
+
 
 def data_std(data_lst):
     return [np.std(data_lst)]
@@ -57,8 +65,6 @@ def plot(pos, fig=None, color=None, mark=None):
     if not mark is None:
         for idx, p in enumerate(pos):
             text = mark[idx]
-            ax.annotate(text, xy=tuple(p), xytext=tuple(p+.1),
-                    arrowprops=dict(arrowstyle="->",connectionstyle="arc3"))
+            ax.annotate(text, xy=tuple(p), xytext=tuple(p + .1),
+                        arrowprops=dict(arrowstyle="->", connectionstyle="arc3"))
     return fig
-
-
