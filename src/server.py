@@ -7,11 +7,15 @@ from dataset import prepare_dataset
 from method import CNN, kNN
 from data_process import data_signal
 
+from IPython import embed
+
 
 class Server:
-    def __init__(self, train_ds_path, method, model_path=None):
+    def __init__(self, train_ds_path, method, signal, model_path=None):
         # prepare training dataset
-        self.train_ds = prepare_dataset(train_ds_path, 'median')
+        self.train_ds = prepare_dataset(train_ds_path, signal)
+
+        self.signal = signal
 
         # locater
         if method == "CNN":
@@ -27,7 +31,7 @@ class Server:
 
     def get_pred_coord(self, x):
         # get pred pos, x include one vector.
-        pred_pos = self.locater(data_signal['median']([x]))[0]
+        pred_pos = self.locater(data_signal[self.signal]([x]))[0]
         return pred_pos
 
     def listen_and_response(self):
@@ -43,7 +47,7 @@ class Server:
             vec = np.asarray([data[ap] for ap in self.train_ds.aps])
             # pred_pos = self.get_pred_coord(vec)
             print("vec: {}".format(vec))
-            vec = vec.reshape((1, vec.shape[0], 1))
+            vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
             pred_pos = self.locater(vec)[0]
             ret_dict = {'x': float(pred_pos[0]), 'y': float(pred_pos[1])}
             print("send {}: {}".format(addr, ret_dict))
@@ -52,8 +56,9 @@ class Server:
         s.close()
 
 
-def pseudo_client():
-    test_ds = prepare_dataset("../data/val.txt", 'median')
+def client():
+    test_ds = prepare_dataset("../data/val.txt", 'raw')
+    print("test_ds.ndary.shape: {}".format(test_ds.ndary.shape))
 
     address = ('127.0.0.1', 31500)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -61,7 +66,7 @@ def pseudo_client():
     for test_sample, pos in zip(test_ds.ndary, test_ds.pos):
         data_dict = {}
         for idx, ap in enumerate(test_ds.aps):
-            data_dict[ap] = float(test_sample[idx][0])
+            data_dict[ap] = test_sample[idx].tolist()
         data_dict['tag'] = 'test'
         print("send {}: {}".format(address, data_dict))
         s.sendto(json.dumps(data_dict).encode(), address)
@@ -74,7 +79,8 @@ def pseudo_client():
 
 
 def main():
-    server = Server("../data/train.txt", "4NN")
+    server = Server("../data/train.txt", "CNN", 'raw', "../cnn_data/ckpt/euclid_loss/model_epoch5000.ckpt")
+    # server = Server('../data/train.txt', '4NN', 'median')
     server.listen_and_response()
     return
     from dataset import prepare_dataset

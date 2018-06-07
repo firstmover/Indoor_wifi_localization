@@ -19,14 +19,16 @@ else:
 
 
 def plot_pred(train_ds, test_ds, pred, title=None):
+    pred = np.asarray(pred)
+    print("pred.shape: {}".format(pred.shape))
     fig = plot(train_ds.pos, color="b")
-    gt_mark = ["gt{0}_({1:.2f},{2:.2f})".format(i, test_ds.pos[i][0], test_ds.pos[i][1]) \
+    gt_mark = ["gt{0}_({1:.2f},{2:.2f})".format(i, test_ds.pos[i][0], test_ds.pos[i][1])
                for i in range(len(test_ds.pos))]
-    pred_mark = ["pred{0}_({1:.2f},{2:.2f})".format(i, pred[i][0], pred[i][1]) \
+    pred_mark = ["pred{0}_({1:.2f},{2:.2f})".format(i, pred[i][0], pred[i][1])
                  for i in range(len(pred))]
     fig = plot(test_ds.pos, fig=fig, color="y", mark=gt_mark)
     fig = plot(pred, fig=fig, color="r", mark=pred_mark)
-    if not title is None:
+    if title is not None:
         plt.title(title)
     plt.xlabel("x")
     plt.ylabel("y")
@@ -83,7 +85,7 @@ class CNN(object):
         self.cnn.initialize(weights_path)
 
     def __call__(self, test_samples):
-        return self.cnn.test(test_samples)
+        return self.cnn.test(test_samples)[0]
 
 
 if __name__ == "__main__":

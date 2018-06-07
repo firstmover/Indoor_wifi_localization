@@ -10,10 +10,12 @@ from IPython import embed
 def prepare_dataset(path, signal):
     with open(path, 'r') as f:
         lines = [l.strip() for l in f.readlines()]
-    if signal not in list(data_signal.keys()):
+    if signal not in list(data_signal.keys()) and signal != "raw":
         raise ValueError("invalid signal name.")
     ds = Dataset(lines)
-    return ds.process(data_signal[signal])
+    if signal != 'raw':
+        ds = ds.process(data_signal[signal])
+    return ds
 
 
 def dicts2ndarray(data_dicts):

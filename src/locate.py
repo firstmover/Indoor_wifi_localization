@@ -40,8 +40,8 @@ def main(args):
         raise ValueError("unknown method {}, use -h for details".format(args.method))
 
     true_coords = test_ds.pos
+    print("test_ds.ndary.shape: {}".format(test_ds.ndary.shape))
     coords = locater(test_ds.ndary)
-    embed()
     print("test_ds.ndary:")
     print(test_ds.ndary)
     print("True coords")
