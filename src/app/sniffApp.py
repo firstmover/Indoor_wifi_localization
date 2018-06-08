@@ -15,10 +15,12 @@ import process
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse, InstructionGroup
+from kivy.properties import ObjectProperty
+from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.config import Config
-Config.set("graphics", "width", '300')
-Config.set("graphics", "height", "500")
+Config.set("graphics", "width", '600')
+Config.set("graphics", "height", "1000")
 from kivy.core.window import Window
 
 PLATFORM = platform.system()
@@ -26,8 +28,31 @@ PLATFORM = platform.system()
 if PLATFORM not in ['Linux', 'Darwin']:
     raise ValueError('only support Linux or MacOS system.')
 
+class DynamicBtn(Button):
+    
+    def __init__(self, **kwargs):
+        kwargs["text"] = "Start"
+        super(DynamicBtn, self).__init__(**kwargs)
+        # flag used to indicate the status
+        # initial -1 means not yet pressed
+        # once pressed, the flag can only have 2 states: 0 and 1
+        # 0: means the button has been pressed for even times
+        # thus the text shown should be "Resume" 
+        # 1: otherwise, show "Pause"
+        # NOTE: once another "Clear" button has been pressed
+        # this button re-initialize to -1 and show "Start"
+        self.flag = -1
+
+    def reinit(self):
+        self.text = "Start"
+        self.flag = -1
+
+
 class sniffWidget(Widget):
     
+    # two button as property
+    btn1 = ObjectProperty(None)
+    btn2 = ObjectProperty(None)
     def __init__(self, iface, amount, tag, func, serv_addr, bufsize=1024):
         """
             iface: interface to sniff on
@@ -62,12 +87,43 @@ class sniffWidget(Widget):
         self.config()
         
         # visualize aps
-        self.visual_aps()
+        #self.visual_aps()
 
         # initial coords
         self.coords = (0, 0)
-
+    
+        # used to record all instructions that draw user-dots
         self.obj = InstructionGroup()
+        self.objects = []
+
+        # used to indicate whether update should be down actually
+        self.update_flag = 0
+    
+        # children widget, 2 buttons
+        # define event behavior for those two
+        def _on_press1(instance):
+            # change the text and flag
+            if instance.flag == -1:
+                instance.flag = 1
+                instance.text = "Pause"
+                instance.parent.set_flag()
+            elif instance.flag == 0:
+                instance.flag = 1
+                instance.text = "Pause"
+                instance.parent.set_flag()
+            elif instance.flag == 1:
+                instance.flag = 0  
+                instance.text = "Resume"
+                instance.parent.unset_flag()
+
+        def _on_press2(instance):
+            # clear the canvas and re-initial btn1
+            instance.parent.clear()
+            instance.parent.btn1.reinit()
+            instance.parent.unset_flag()
+        
+        self.btn1.bind(on_press=_on_press1)
+        self.btn2.bind(on_press=_on_press2)
 
     def config(self):
         name_dict = {"tag": self.tag}
@@ -84,7 +140,6 @@ class sniffWidget(Widget):
                 self.prcs_dict[ssid] = []
             return
 
-        # try 10 times
         # if fail, then exit
         raise Exception("connect to server {} failed, please \
                          check your network connection and try again".format(self.serv_addr))
@@ -133,26 +188,40 @@ class sniffWidget(Widget):
             self.coords = (recv_dict["x"], recv_dict["y"])
 
     def visualize(self):
-        self.canvas.remove(self.obj)
         self.obj = InstructionGroup()
         d = 20.
         x, y = self.coords
         self.obj.add(Color(0,1,0))
         self.obj.add(Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d)))
         self.canvas.add(self.obj)
+        self.objects.append(self.obj)
+
+    def clear(self):
+        # clear all user dots
+        for obj in self.objects:
+            self.canvas.remove(obj)
+        self.objects = []
+
+    def set_flag(self):
+        self.update_flag = 1
+
+    def unset_flag(self):
+        self.update_flag = 0
 
     def update(self, dt):
-        # update periodic of interval dt(s)
-        # 1.sniff
-        self.sniff(dt*0.8/len(self.ssids))
-        # 2.aging
-        self.aging()
-        # 3.process
-        self.process()
-        # 4.sendrecv
-        self.sendrecv()
-        # 5.visualize
-        self.visualize()
+        if self.update_flag:
+            # update periodic of interval dt(s)
+            # 1.sniff
+            self.sniff(dt*0.08/len(self.ssids))
+            # 2.aging
+            self.aging()
+            print(self.rssi_dict)
+            # 3.process
+            self.process()
+            # 4.sendrecv
+            self.sendrecv()
+            # 5.visualize
+            self.visualize()
 
 class sniffApp(App):
 

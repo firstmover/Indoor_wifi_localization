@@ -1,8 +1,25 @@
 #:kivy 1.10.0
 
 <sniffWidget>:
+    btn1: btn1
+    btn2: btn2
+
     canvas:
         Rectangle:
             source: '../../figures/room.png'
             size: self.size
             pos: self.pos
+
+    DynamicBtn:
+        id: btn1 
+        text: "Start"
+        pos: root.x, root.y
+        size: root.width/10., root.height/20.
+
+    Button:
+        id: btn2
+        text: "Clear"
+        pos: root.x, root.y + root.height/20.
+        size: root.width/10., root.height/20.
+
+
