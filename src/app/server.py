@@ -40,7 +40,7 @@ class Server():
 
     def _udp_start(self):
         print("[{}] Server: started at address {}...".format(datetime.now(), self.addr))
-        msg1 = '{"Xiaomi_8334": [0.5, 0],"Wireless PKU": [0.99, 0.5], "PKU Visitor":[0.5, 0.99]}'
+        msg1 = '{"Xiaomi_8334": [0.48, 0.05],"Wireless PKU": [0.92, 0.55], "PKU Visitor":[0.48, 0.95]}'
         cnt = 0
         try:
             while 1:

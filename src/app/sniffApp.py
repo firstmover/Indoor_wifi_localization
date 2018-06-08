@@ -3,6 +3,9 @@ import sys
 sys.path.insert(0, '../sniff_network')
 sys.path.insert(0, '..')
 import platform
+PLATFORM = platform.system()
+
+
 import socket
 import json
 import scapy.all as sca
@@ -90,7 +93,7 @@ class sniffWidget(Widget):
     def visual_aps(self):
         with self.canvas:
             Color(1, 0, 0)
-            d = 10.0
+            d = 20.0
             for ssid in self.ssids:
                 x, y = self.config_dict[ssid]
                 print(x*Window.size[0])
@@ -132,7 +135,7 @@ class sniffWidget(Widget):
     def visualize(self):
         self.canvas.remove(self.obj)
         self.obj = InstructionGroup()
-        d = 10.
+        d = 20.
         x, y = self.coords
         self.obj.add(Color(0,1,0))
         self.obj.add(Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d)))
@@ -168,7 +171,12 @@ class sniffApp(App):
         return sniffer
 
 if __name__ == "__main__":
-    iface = "en0"
+    if PLATFORM == 'Darwin':
+        iface = "en0" 
+    elif PLATFORM == 'Linux':
+        iface = "wlp3s0"
+    else:
+        raise ValueError('unsupported system.')
     amount = 3
     tag = "zxz"
     func = process.__dict__["data_"+"median"]
