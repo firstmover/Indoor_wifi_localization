@@ -157,10 +157,16 @@ class sniffWidget(Widget):
                 Ellipse(pos=(x*Window.size[0], y*Window.size[1]), size=(d, d))
 
     def sniff(self, dt):
+        '''
         num = len(self.ssids)
         for ssid in self.ssids:
             data = sniff_rssi_cmd(self.iface, ssid, 1, dt)
             self.rssi_dict[ssid] += data
+        '''
+        data_dict = sniff_rssi_cmd_list(self.iface, self.ssids, 1, dt)
+        for ssid in self.ssids:
+            self.rssi_dict[ssid] += data_dict[ssid]
+        
 
     def aging(self):
         """
