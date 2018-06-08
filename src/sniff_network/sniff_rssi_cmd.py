@@ -22,7 +22,7 @@ class PktFilter(object):
                             and pkt.info in [i.encode('utf-8') for i in self.ssids]
 
 
-def sniff_rssi_cmd(interface, ssid, amount):
+def sniff_rssi_cmd(interface, ssid, amount, timeout=None):
     import time 
     if PLATFORM == 'Darwin':
         data = []

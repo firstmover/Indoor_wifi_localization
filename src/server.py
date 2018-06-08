@@ -2,6 +2,7 @@ import os
 import socket
 import json
 import numpy as np
+import time
 
 from dataset import prepare_dataset
 from method import CNN, kNN
@@ -31,9 +32,13 @@ class Server:
 
         self.ap_position = {
             "Xiaomi_8334": [0.5, 0],
-            "Wireless PKU": [0.99, 0.5],
-            "PKU Visitor": [0.5, 0.99]
-        }
+            "Xiaomi_3336": [1, 0.5],
+            "Xiaomi_B84D": [0.5, 1],
+            "Xiaomi_8334_5G": [0.5, 0],
+            "Xiaomi_3336_5G": [1, 0.5],
+            "Xiaomi_B84D_5G": [0.5, 1],
+
+            }
 
     def listen_and_response(self):
         # server listening to request.
@@ -43,10 +48,13 @@ class Server:
 
         while True:
             data, addr = s.recvfrom(2048)
+            data = json.loads(data.decode()) 
             print("recieved {}: {}".format(addr, data))
-            data = json.loads(data.decode())
+            # client require ap names ans positions. 
             if len(list(data.keys())) == 1:
+                time.sleep(5)
                 s.sendto(json.dumps(self.ap_position).encode(), addr)
+                print("sending ap positions.")
             else:
                 vec = [data[ap] for ap in self.train_ds.aps]
                 match_len = True
@@ -55,12 +63,12 @@ class Server:
                         match_len = False
                 if not match_len:
                     s.sendto(json.dumps({'x': 0, 'y': 0}).encode(), addr)
+                    continue 
                 vec = np.asarray(vec)
-                print("vec: {}".format(vec))
                 vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
                 pred_pos = self.locater(vec)[0]
-                ret_dict = {'x': float(pred_pos[0]), 'y': float(pred_pos[1])}
-                print("send {}: {}".format(addr, ret_dict))
+                ret_dict = {'x': float(pred_pos[0]) / 3.0, 'y': float(pred_pos[1]) / 7.0}
+                print("sending {}: {}".format(addr, ret_dict))
                 s.sendto(json.dumps(ret_dict).encode(), addr)
 
         s.close()

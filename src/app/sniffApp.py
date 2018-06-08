@@ -10,6 +10,7 @@ import socket
 import json
 import scapy.all as sca
 from sniff_rssi import sniff_rssi
+from sniff_rssi_cmd import sniff_rssi_cmd 
 import process
 
 from kivy.app import App
@@ -158,7 +159,7 @@ class sniffWidget(Widget):
     def sniff(self, dt):
         num = len(self.ssids)
         for ssid in self.ssids:
-            data = sniff_rssi(self.iface, ssid, 1, dt)
+            data = sniff_rssi_cmd(self.iface, ssid, 1, dt)
             self.rssi_dict[ssid] += data
 
     def aging(self):
@@ -209,6 +210,7 @@ class sniffWidget(Widget):
         self.update_flag = 0
 
     def update(self, dt):
+        print("in update")
         if self.update_flag:
             # update periodic of interval dt(s)
             # 1.sniff
