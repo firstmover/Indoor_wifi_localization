@@ -46,6 +46,29 @@ def sniff_rssi_cmd(interface, ssid, amount, timeout=None):
         raise ValueError('unknown system.')
 
 
+def sniff_rssi_cmd_list(interface, ssid, amount, timeout=None):
+    import time 
+    if PLATFORM == 'Darwin':
+        std_out = subprocess.check_output(['airport', '-s'])
+        std_out = std_out.decode('utf-8').split('\n')
+        # not sure what happens when ssid is Chinese.
+        std_out = std_out[1:]
+        ssid_sniffed = [i[:32].strip() for i in std_out if len(i) > 32]
+        data = {}
+        for i, s in enumerate(ssid_sniffed):
+            if s in ssid:
+                data[s] = [int(std_out[i][51:54])]
+        for s in ssid:
+            if s not in data.keys():
+                data[s] = []
+        return data 
+
+    elif PLATFORM == 'Linux':
+        raise NotImplementedError('Linux cmd sniffing not implemented.')
+    else:
+        raise ValueError('unknown system.')
+
+
 def main():
     # argument parser 
     parser = argparse.ArgumentParser()
