@@ -10,7 +10,7 @@ import socket
 import json
 import scapy.all as sca
 from sniff_rssi import sniff_rssi
-from sniff_rssi_cmd import sniff_rssi_cmd 
+from sniff_rssi_cmd import sniff_rssi_cmd_list 
 import process
 
 from kivy.app import App
@@ -256,7 +256,7 @@ if __name__ == "__main__":
         raise ValueError('unsupported system.')
     amount = 3
     tag = "zxz"
-    func = process.__dict__["data_"+"median"]
+    func = process.__dict__["data_"+"mean"]
     serv_addr = ("127.0.0.1", 12138)
     sniffApp(iface, amount, tag, func, serv_addr).run()
 

@@ -67,7 +67,7 @@ class Server:
                 vec = np.asarray(vec)
                 vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
                 pred_pos = self.locater(vec)[0]
-                ret_dict = {'x': float(pred_pos[0]) / 3.0, 'y': float(pred_pos[1]) / 7.0}
+                ret_dict = {'x': float(pred_pos[0]) / 3.0, 'y': float(pred_pos[1]) / 8.0}
                 print("sending {}: {}".format(addr, ret_dict))
                 s.sendto(json.dumps(ret_dict).encode(), addr)
 
