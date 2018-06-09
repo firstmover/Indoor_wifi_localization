@@ -138,13 +138,21 @@
 
   > python3 server.py
 
-  再运行client。client 将启动图形界面。点击按钮**start**后，server对给定ap的RSSI测量，并将RSSI值处理发送给server。在收到server返回的预测位置后，在界面上用绿点现实位置。启动 client 运行指令
+- 再运行client。client 将启动图形界面。点击按钮**start**后，server对给定ap的RSSI测量，并将RSSI值处理发送给server。在收到server返回的预测位置后，在界面上用绿点现实位置。启动 client 运行指令
 
   > sudo python3 client.py
 
-  client的图形界面示例：
+- client app说明：
 
-  ![app-example](./figures/app-3.png)
+  - 运行client后会开启图形窗口，若未能成功运行窗口基本是因为和server的握手失败，检查网路连接，地址与端口设置后重试
+  - 点击Start按钮则会开始周期性采集rssi，与server交互获得定位坐标，在界面中可视化位置。Start开始后会一直持续定位，并且可视化的位置会保留。
+  - 点击Pause暂停定位，点击Resume恢复
+  - 点击Clear将清除所有位置点，恢复界面初始状态
+  - 点击左上角叉关闭程序
+
+client的图形界面示例：
+
+![app-example](./figures/app-3.png)
 
 ## 参考资料
 
