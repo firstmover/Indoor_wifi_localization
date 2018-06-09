@@ -96,7 +96,7 @@
 
   > python3 result_rssi_visualizer.py
 
-  ![heatmap](./figure/rssi_heatmap_Xiaomi_3336.png)
+  ![heatmap](./figures/rssi_heatmap_Xiaomi_3336.png)
 
 ## 建立定位模型
 
