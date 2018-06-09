@@ -8,7 +8,7 @@
 
 - 硬件要求: 支持monitor mode的网卡
 
-- python3 依赖: numpy, scapy
+- python3 依赖: numpy, scapy, matplotlib(可视化结果)
 
 ### ubuntu 16.x
 
@@ -90,6 +90,12 @@
 
   > watch -n 0.5 "airport -s | grep 'Xiaomi'"
 
+### 可视化测量的RSSI结果
+
+- 使用 matplotlib 对每一个ap绘制热度图，差值方法为：bilinear。运行以下指令产生热度图。
+
+  > python3 result_rssi_visualizer.py
+
 ## 建立定位模型
 
 ### 运行环境说明
@@ -134,7 +140,7 @@
 
   > sudo python3 client.py
 
-  client的图形界面：
+  client的图形界面示例：
 
   ![app-example](./figures/app-3.png)
 
