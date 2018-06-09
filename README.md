@@ -96,6 +96,8 @@
 
   > python3 result_rssi_visualizer.py
 
+  ![heatmap](./figure/rssi_heatmap_Xiaomi_3336.png)
+
 ## 建立定位模型
 
 ### 运行环境说明
@@ -116,7 +118,7 @@
 
   输出为按照test.txt中文件的顺序依次预测的二维坐标位置以及散点图表示，示例图片见下
 
-### 可视化
+### 可视化预测结果
 
  ![tem](./figures/pred.png)
 
