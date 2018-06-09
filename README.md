@@ -5,7 +5,10 @@
 ### 运行环境说明
 
 - 建议运行环境: Macos, ubuntu 16.x as sudo, python3
+
 - 硬件要求: 支持monitor mode的网卡
+
+- python3 依赖: numpy, scapy
 
 ### ubuntu 16.x
 
@@ -53,6 +56,12 @@
 
   > sudo ./unsetmon.sh
 
+- 对于动态查看当前RSSI:
+
+  > watch -n 0.2 nmvli dev wifi list
+
+  > sudo iwlist wlp3s0 scan
+
 ### MacOS 
 
 - 查看网卡编号
@@ -71,15 +80,7 @@
 
   > sudo python3 sniff_rssi_cmd.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
 
-### 动态查看RSSI
-
-- Linux
-
-  > watch -n 0.2 nmvli dev wifi list
-
-  > sudo iwlist wlp3s0 scan
-
-- MaxOS
+- 对于动态查看当前RSSI:
 
   先建立系统 airport 命令的软连接
 
@@ -93,9 +94,9 @@
 
 ### 运行环境说明
 
-- 测试通过环境:
-  - MacOS, python 3.6
-  - TBD
+- 测试通过环境: MacOS, python3.6
+
+- python3 依赖: numpy, scapy, tensorflow(如果使用cnn模型)
 
 ### 运行前准备
 
@@ -113,9 +114,29 @@
 
  ![tem](./figures/pred.png)
 
-### 误差分析
+## 用server client模型动态定位
 
-TBD
+### 运行环境说明
+
+- 测试通过环境: MacOS, python3.6
+
+- python3 依赖: numpy, scapy, tensorflow(如果使用cnn模型), kivy(图形界面)
+
+### 运行定位模型
+
+- 默认设定为 4kNN 模型和 median 信号。总体结构为，client负责测量给定ap的RSSI信号，进行简单处理（取平均值），发送给server。server负责对接收到的数据进行分析定位，将定位结果发送给client。
+
+- 先运行server。启动 server 运行指令：
+
+  > python3 server.py
+
+  再运行client。client 将启动图形界面。点击按钮**start**后，server对给定ap的RSSI测量，并将RSSI值处理发送给server。在收到server返回的预测位置后，在界面上用绿点现实位置。启动 client 运行指令
+
+  > sudo python3 client.py
+
+  client的图形界面：
+
+  ![app-example](./figures/app-3.png)
 
 ## 参考资料
 
