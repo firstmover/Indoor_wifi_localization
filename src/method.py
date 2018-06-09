@@ -34,6 +34,10 @@ def plot_pred(train_ds, test_ds, pred, title=None):
     plt.ylabel("y")
     return fig
 
+def compute_error(true_coords, pred_coords):
+    error_coords = true_coords - pred_coords
+    error = sum(map(np.linalg.norm, error_coords))
+    return error
 
 class kNN(object):
     """
