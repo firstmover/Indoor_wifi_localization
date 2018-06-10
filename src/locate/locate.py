@@ -50,9 +50,9 @@ def main(args):
     fig = plot_pred(train_ds, test_ds, pred_coords, "prediciton using {} with {}".format(args.method, args.signal))
     fig.show()
     while 1:
-        c = raw_input("save or not?[Y/N]")
+        c = input("save or not?[Y/N]")
         if c == "Y":
-            name = raw_input("input name for saved file")
+            name = input("input name for saved file")
             fig.savefig(name)
             break
         elif c == "N":

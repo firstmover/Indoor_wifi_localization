@@ -8,6 +8,7 @@ from data_process import plot
 PLATFORM = platform.system()
 
 # pity for windows
+'''
 if PLATFORM == "Windows":
     reload(sys)
     sys.setdefaultencoding('gbk')
@@ -16,6 +17,7 @@ elif PLATFORM == "Darwin":
 else:
     reload(sys)
     sys.setdefaultencoding('utf-8')
+'''
 
 
 def plot_pred(train_ds, test_ds, pred, title=None):

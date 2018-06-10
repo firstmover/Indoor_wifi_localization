@@ -4,13 +4,13 @@
 
 ### 运行环境说明
 
-- 建议运行环境: Macos, ubuntu 16.x as sudo, python3
+- 建议运行环境: MacOS, ubuntu 16.04, python3
 
 - 硬件要求: 支持monitor mode的网卡
 
 - python3 依赖: numpy, scapy, matplotlib(可视化结果)
 
-### ubuntu 16.x
+### ubuntu 16.04
 
 - 查看所要运行网卡编号
 
@@ -26,13 +26,17 @@
 
    ![1526895198531](./figures/iwlist.png)
 
+- 进入对应文件目录
+
+  > cd src/sniff_network
+
 - 修改脚本**setmon.sh**和**unsetmon.sh**,将其中的网卡名称换成对应的网卡名称
 
 - **以管理员身份**执行**setmon.sh**，将网卡配置为**monitor mode**
 
   > sudo ./setmon.sh
 
-  脚本会要求输入管理员密码，同时会关闭**network-manager**, 即之后无法使用该网卡联网
+  脚本会要求输入管理员密码，同时会关闭**network-manager**, 即之后无法使用该网卡联网,ubuntu下如果不关闭network-manager就无法采用scapy在monitor模式下抓包，原因不明。
 
   运行之后可以执行
 
@@ -40,13 +44,13 @@
 
   确认所要运行的网卡已经处于**monitor mode**![1526894507738](./figures/iwconfig2.png)
 
-- 配置输入SSID文件，文件中每一行对应一个所要提取rssi的AP的SSID,如下![1526894302071](./figures/ssid.png)
+- 配置输入SSID文件***ssids.txt***，文件中每一行对应一个所要提取rssi的AP的SSID,如下![1526894302071](./figures/ssid.png)
 
 - 以**管理员身份**运行程序**sniff_rssi.py**, 注意以**python3**执行，执行**sudo python3 sniff_rssi.py -h**查看帮助，示例运行如下
 
-  >sudo python3 sniff_rssi.py --iface wlp3s0 --input ssids.txt --output rssi.json --amount 100
+  >sudo python3 sniff_rssi.py --iface wlp3s0 --input ssids.txt --output rssi.txt --amount 100 --tag 0-0
 
-  注意程序会将提取的rssi保存为**json**
+  注意程序会将提取的rssi保存为json格式的**rssi.txt**
 
   使用 sudo 权限可能导致 python 找不到目标 module，需要调整环境变量，使用一下命令
 
@@ -56,7 +60,7 @@
 
   > sudo ./unsetmon.sh
 
-- 对于动态查看当前RSSI:
+- 另一种方式利用命令行动态查看当前RSSI:
 
   > watch -n 0.2 nmvli dev wifi list
 
@@ -72,15 +76,21 @@
 
   使用网卡**en0**
 
+- 进入对应文件目录
+
+  > cd src/sniff_network
+
+- 配置**ssids.txt**同上
+
 - 管理员身份运行**sniff_rssi.py**
 
-  > sudo python3 sniff_rssi.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
+  > sudo python3 sniff_rssi.py -i ssids.txt -o rssi.txt -if en0 -a 100 -t 0-0
 
-- 使用命令行解析RSSI，运行 **sniff_rssi_cmd.py**
+- 或者使用命令行脚本的方式获取RSSI，运行 **sniff_rssi_cmd.py**
 
-  > sudo python3 sniff_rssi_cmd.py -i SSIDs.txt -o result.txt -if en0 -a 100 -t test
+  > sudo python3 sniff_rssi_cmd.py -i ssids.txt -o rssi.txt -if en0 -a 100 -t 0-0
 
-- 对于动态查看当前RSSI:
+- 利用命令行工具动态查看当前RSSI:
 
   先建立系统 airport 命令的软连接
 
@@ -92,9 +102,13 @@
 
 ### 可视化测量的RSSI结果
 
-- 使用 matplotlib 对每一个ap绘制热度图，差值方法为：bilinear。运行以下指令产生热度图。
+- 打开对应文件目录
 
-  > python3 result_rssi_visualizer.py
+  > cd src/sniff_network
+
+- 运行*result_rssi_visulizer.py*绘制对应的热力图，运行**python3 result_rssi_visualizer.py -h**查看帮助，示例运行如下
+
+  > python3 result_rssi_visualizer.py -f ../../data/train.txt -s rssi_heatmap.png
 
   ![heatmap](./figures/rssi_heatmap_Xiaomi_3336.png)
 
@@ -102,21 +116,25 @@
 
 ### 运行环境说明
 
-- 测试通过环境: MacOS, python3.6
+- 测试通过环境: MacOS, python3.6(**注：这里因为实验用的Ubuntu系统的主机网卡不支持5GHz频段的wifi,与系统本身无关，即Ubuntu下同样可以正常通过**)
 
 - python3 依赖: numpy, scapy, tensorflow(如果使用cnn模型)
 
 ### 运行前准备
 
-- 预先测量并存储的数据，数据应由之前所述的*sniff_rssi.py*产生, **注意存储json string的文件，tag域必须为x-y 的格式，其中x y代表对应该点的浮点坐标。不同位置的RSSI使用的AP名称(SSID)必须完全一致，且要求同一个AP在不同位置测量的RSSI序列长度一致(不同AP的可以不同)。作为训练(指纹)的数据和测试的数据必须使用相同的AP名称且相同AP的序列长度一致。同时文件编码应为utf-8。参考示例文件data/train.txt和data/val.txt**
+- 预先测量并存储的数据，数据应由之前所述的*sniff_rssi.py*产生, **注意存储json string的文件，tag域必须为x-y 的格式，其中x y代表对应该点的浮点坐标。不同位置的RSSI使用的AP名称(SSID)必须完全一致，且要求各个AP在不同位置测量的RSSI序列长度一致(实验中为10)。作为训练的数据和测试的数据必须使用相同的AP名称且RSSI序列长度一致。同时文件编码应为utf-8。参考示例文件data/train.txt和data/val.txt**
 
 ### 运行定位模型
 
-- 运行**python locate.py -h**查看参数说明，示例运行如下
+- 打开对应文件目录
 
-  > python locate.py --train ../data/train.txt --test ../data/val.txt --method 4NN --signal median
+  > cd src/locate
 
-  输出为按照test.txt中文件的顺序依次预测的二维坐标位置以及散点图表示，示例图片见下
+- 运行**python3 locate.py -h**查看参数说明，示例运行如下
+
+  > python3 locate.py --train ../../data/train.txt --test ../../data/val.txt --method 4NN --signal median
+
+  输出为按照val.txt中文件的顺序依次预测的二维坐标位置以及散点图表示，示例图片见下
 
 ### 可视化预测结果
 
@@ -126,21 +144,27 @@
 
 ### 运行环境说明
 
-- 测试通过环境: MacOS, python3.6
+- 测试通过环境: MacOS, python3.6(*Ubuntu同之前的说明*)
 
 - python3 依赖: numpy, scapy, tensorflow(如果使用cnn模型), kivy(图形界面)
 
 ### 运行定位模型
 
-- 默认设定为 4kNN 模型和 median 信号。总体结构为，client负责测量给定ap的RSSI信号，进行简单处理（取平均值），发送给server。server负责对接收到的数据进行分析定位，将定位结果发送给client。
+- 默认设定为 kNN(k=4) 模型和 median 信号。总体结构为，client负责测量给定ap的RSSI信号，进行简单处理（取中位数），发送给server。server负责对接收到的数据进行分析定位，将定位结果发送给client。
 
-- 先运行server。启动 server 运行指令：
+- 打开对应文件目录
 
-  > python3 server.py
+  > cd src/app
 
-- 再运行client。client 将启动图形界面。点击按钮**start**后，server对给定ap的RSSI测量，并将RSSI值处理发送给server。在收到server返回的预测位置后，在界面上用绿点现实位置。启动 client 运行指令
+- 运行服务器：运行**python3 server.py -h**查看帮助，示例运行如下。**注意:server需要给client发送各个AP的SSID及坐标，若使用不同于示例的数据请修改server中的部分**
 
-  > sudo python3 client.py
+  > python3 server.py -t ../../data/train.txt  -m 4NN -s median
+
+- 运行客户端：注意根据自己电脑的无线网卡名称对应修改**sniffApp.py**中的部分代码，这里因为kivy框架内置命令行参数无法通过命令行参数设置。同时注意必须以**sudo**运行。
+
+  client 将启动图形界面。点击按钮**start**后，client对给定ap的RSSI测量，并将RSSI值处理发送给server。在收到server返回的预测位置后，在界面上用绿点现实位置
+
+  > sudo python3 sniffApp.py
 
 - client app说明：
 
@@ -163,4 +187,4 @@ client的图形界面示例：
 - MacOS命令行网络设置检查：http://osxdaily.com/2014/09/03/list-all-network-hardware-from-the-command-line-in-os-x/
 - 8 Linux Commands: To Find Out Wireless Network Speed, Signal Strength And Other Information: https://www.cyberciti.biz/tips/linux-find-out-wireless-network-speed-signal-strength.html
 
-### papers
+### 

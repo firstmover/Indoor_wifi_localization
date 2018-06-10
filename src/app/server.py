@@ -1,75 +1,106 @@
+import os
+import sys
+sys.path.insert(0, "../locate")
+
 import socket
-import threading
+import json
+import numpy as np
 import time
-from datetime import datetime
-import random
+import argparse
 
-class Server():
-    """Server process class"""
-    def __init__(self, addr_type, serv_type, addr):
-        """ addr_type: str, can be 'ipv4' or 'ipv6'
-            serv_type: str, can be 'tcp' or 'udp'
-            addr: needed only when serv_type == 'tcp'"""
-        if addr_type == 'ipv4':
-            self.addr_type = socket.AF_INET
-        elif addr_type == 'ipv6':
-            self.addr_type = socket.AF_INET6
-        else:
-            raise Exception("invalid addr_type", addr_type, "should be 'ipv4' or 'ipv6'")
+from dataset import prepare_dataset
+from method import CNN, kNN
+from data_process import data_signal
 
-        if serv_type == 'tcp':
-            self.serv_type = socket.SOCK_STREAM
-        elif serv_type == 'udp':
-            self.serv_type = socket.SOCK_DGRAM
+#from IPython import embed
+parser = argparse.ArgumentParser()
+parser.add_argument("-t", "--train", type=str, default="../../data/train.txt", \
+                    help="training json format file path(default: ../../data/train.txt)")
+parser.add_argument("-m", "--method", type=str, default="4NN", help="matching algorithm, only support kNN now,\
+                    give xNN(x is a integer) indicates using kNN(k=x)(default: 4NN)")
+parser.add_argument("-s", "--signal", type=str, default="median", help="signal type used for matching,\
+                    should be median/mean/std/min/max(default: median)")
+parser.add_argument("--ip", type=str, default="127.0.0.1", help="server ip address(default: 127.0.0.1)")
+parser.add_argument("--port", type=int, default=12138, help="server port(default: 12138)")
+
+
+class Server:
+    def __init__(self, train_ds_path, method, signal, addr, model_path=None):
+        # prepare training dataset
+        self.train_ds = prepare_dataset(train_ds_path, signal)
+
+        self.signal = signal
+
+        # locater
+        if method == "CNN":
+            if model_path is None:
+                raise ValueError("CNN model path should be provided.")
+            self.locater = CNN(self.train_ds, model_path)
+        elif method.find("NN"):
+            self.locater = kNN(int(method[0:-2]), self.train_ds)
         else:
-            raise Exception("invalid serv_type", serv_type, "should be 'tcp' or 'udp'")
+            raise ValueError("invalid method.")
 
         self.addr = addr
-        self.sock = socket.socket(self.addr_type, self.serv_type)
-        self.sock.bind(addr)
-        print("[{}] Server: creates a socket at address: {}".format(datetime.now(), self.addr))
 
-    def start(self, max_queue_num=5, bufsize=4096):
-        self.bufsize = bufsize
-        thread = threading.Thread(target=self._udp_start)
-        thread.start()
-        while thread.isAlive():
-            thread.join(0.1)
-        self.sock.close()
-        print("[{}] Server: socket closed, server exit".format(datetime.now()))
+        self.ap_position = {
+            "Xiaomi_8334": [0.5, 0],
+            "Xiaomi_3336": [1, 0.5],
+            "Xiaomi_B84D": [0.5, 1],
+            "Xiaomi_8334_5G": [0.5, 0],
+            "Xiaomi_3336_5G": [1, 0.5],
+            "Xiaomi_B84D_5G": [0.5, 1],
 
-    def _udp_start(self):
-        print("[{}] Server: started at address {}...".format(datetime.now(), self.addr))
-        msg1 = '{"Xiaomi_8334": [0.48, 0.05],"Xiaomi_3336": [0.92, 0.55], "Wireless PKU":[0.48, 0.95]}'
-        cnt = 0
-        try:
-            while 1:
-                # receive data and send back
-                data, clientaddr = self.sock.recvfrom(self.bufsize)
-                print("[{}] Server receive:{}({})".format(datetime.now(), data, clientaddr))
-                if data:
-                    choice = input("send msg number")
-                    if choice == 1:
-                        msg = msg1
-                    else:
-                        x = random.uniform(0.1, 0.9)
-                        y = random.uniform(0.1, 0.9)
-                        msg = '{"x": %f, "y": %f}'%(x, y)
-                    self.sock.sendto(msg, clientaddr)
-                    print("[{}] Server send: {}({})".format(datetime.now(), msg, clientaddr))
-        except Exception as e:
-            print("[{}] Server : error '{}' occured".format(datetime.now(), e))
-        '''
-        thread = threading.Thread(target=self._udp_serv)
-        thread.start()
-        while thread.isAlive():
-            thread.join(1.0)
-        '''
+            }
+        print("Server starting at {} with udp...".format(self.addr))
+        
+
+    def listen_and_response(self):
+        # server listening to request.
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind(self.addr)
+
+        while True:
+            data, addr = s.recvfrom(2048)
+            data = json.loads(data.decode()) 
+            print("recieved {}: {}".format(addr, data))
+            # client require ap names ans positions. 
+            if len(list(data.keys())) == 1:
+                time.sleep(5)
+                s.sendto(json.dumps(self.ap_position).encode(), addr)
+                print("sending ap positions.")
+            else:
+                vec = [data[ap] for ap in self.train_ds.aps]
+                match_len = True
+                for i in vec:
+                    if len(i) != len(vec[0]):
+                        match_len = False
+                if not match_len:
+                    s.sendto(json.dumps({'x': 0, 'y': 0}).encode(), addr)
+                    continue 
+                vec = np.asarray(vec)
+                vec = vec.reshape((1, vec.shape[0], vec.shape[1]))
+                pred_pos = self.locater(vec)[0]
+                ret_dict = {'x': float(pred_pos[0]) / 3.0, 'y': float(pred_pos[1]) / 8.0}
+                print("sending {}: {}".format(addr, ret_dict))
+                s.sendto(json.dumps(ret_dict).encode(), addr)
+
+        s.close()
+
+def main():
+    # server = Server("../data/train.txt", "CNN", 'raw', "../cnn_data/ckpt/euclid_loss/model_epoch5000.ckpt")
+    args = parser.parse_args()
+    server = Server(args.train, args.method, args.signal, (args.ip, args.port))
+    server.listen_and_response()
+    return
+    from dataset import prepare_dataset
+    from method import kNN
+    train_ds = prepare_dataset("../data/train.txt", 'median')
+    test_ds = prepare_dataset("../data/val.txt", 'median')
+    locater = kNN(4, train_ds)
+    print("result: {}".format(locater(test_ds.ndary)))
+
 
 if __name__ == "__main__":
-    addr_type = "ipv4"
-    serv_type = "udp"
-    addr = ("127.0.0.1", 12138)
-    server = Server(addr_type, serv_type, addr)
-    server.start()
-
+    main()

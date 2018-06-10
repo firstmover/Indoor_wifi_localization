@@ -3,8 +3,12 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-from IPython import embed
-
+import argparse
+#from IPython import embed
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--file", type=str, default="rssi.txt", help="json format rssi file path(default: rssi.txt)")
+parser.add_argument("-s", "--save_file", type=str, default="rssi_heatmap.png",\
+                    help="rssi heatmap to be saved(default: rssi_heatmap.png")
 
 def visualize_heatmap(data, save_path):
     plt.imshow(data, cmap='hot', interpolation='bilinear')
@@ -19,20 +23,17 @@ def load_data(path):
 
 
 def main():
-    data = load_data('../../data/result.txt')
+    args = parser.parse_args()
+    data = load_data(args.file)
     ssids = [i for i in list(data[0].keys()) if i != 'tag']
-    ssid2rssi = {key: np.zeros((4, 8)) for key in ssids}
+    ssid2rssi = np.zeros((4, 8))
     for d in data:
-        if d['tag'] == 'test' or len(d['tag'].split('-')) != 2:
-            continue
         x, y = d['tag'].split('-')
         x, y = int(x), int(y)
         for s in ssids:
-            rssi = d[s]
-            ssid2rssi[s][x][y] = np.mean(np.asarray(d[s]))
+            ssid2rssi[x][y] += np.mean(np.asarray(d[s]))
 
-    for k, v in ssid2rssi.items():
-        visualize_heatmap(v, os.path.join('../figures', "rssi_heatmap_{}.png".format(k)))
+    visualize_heatmap(ssid2rssi, args.save_file)
 
 
 if __name__ == "__main__":

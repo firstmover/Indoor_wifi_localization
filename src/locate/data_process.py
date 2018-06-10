@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 PLATFORM = platform.system()
 # pity for windows
+'''
 if PLATFORM == "Windows":
     reload(sys)
     sys.setdefaultencoding('gbk')
@@ -13,6 +14,7 @@ elif PLATFORM == "Darwin":
 else:
     reload(sys)
     sys.setdefaultencoding('utf-8')
+'''
 
 
 data_signal = {
