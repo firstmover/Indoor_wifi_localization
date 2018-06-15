@@ -163,10 +163,6 @@ class sniffWidget(Widget):
             #data_dict = sniff_rssi_cmd(self.iface, self.ssids, 1, dt)
             self.rssi_dict[ssid] += data
 
-        for ssid in self.ssids:
-            self.rssi_dict[ssid] += data_dict[ssid]
-        
-
     def aging(self):
         """
             only keep the latest "amount" rssi values
